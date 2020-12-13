@@ -8,6 +8,8 @@ import (
 	"os"
 	"sort"
 	"sync"
+
+	"github.com/asterisk800/inventoryservice/database"
 )
 
 // Most of the code in this file is used to emulate how we will be working with a database
@@ -63,14 +65,33 @@ func removeProduct(productID int) {
 	delete(productMap.m, productID)
 }
 
-func getProductList() []Product {
-	productMap.RLock()
-	products := make([]Product, 0, len(productMap.m))
-	for _, value := range productMap.m {
-		products = append(products, value)
+func getProductList() ([]Product, error) {
+	results, err := database.DbConn.Query(`SELECT 
+		productId,
+		manufacturer,
+		sku.
+		upc.
+		pricePerUnit,
+		quantityOnHand,
+		productName
+		From products`)
+	if err != nil {
+		return nil, err
 	}
-	productMap.RUnlock()
-	return products
+	defer results.Close()
+	products := make([]Product, 0)
+	for results.Next() {
+		var product Product
+		results.Scan(&product.ProductID,
+			&product.Manufacturer,
+			&product.Sku,
+			&product.Upc,
+			&product.PricePerUnit,
+			&product.QuantityOnHand)
+		products = append(products, product)
+	}
+
+	return products, nil
 }
 
 func getProductIds() []int {
