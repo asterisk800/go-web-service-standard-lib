@@ -110,7 +110,7 @@ func getProductList() ([]Product, error) {
 			&product.QuantityOnHand)
 		products = append(products, product)
 	}
-
+	log.Printf("Retriving result: %v", products)
 	return products, nil
 }
 
