@@ -89,8 +89,8 @@ func getProductList() ([]Product, error) {
 	results, err := database.DbConn.Query(`SELECT 
 		productId,
 		manufacturer,
-		sku.
-		upc.
+		sku,
+		upc,
 		pricePerUnit,
 		quantityOnHand,
 		productName
