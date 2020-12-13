@@ -1,6 +1,7 @@
 package product
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -50,13 +51,32 @@ func loadProductMap() (map[int]Product, error) {
 	return prodMap, nil
 }
 
-func getProduct(productID int) *Product {
-	productMap.RLock()
-	defer productMap.RUnlock()
-	if product, ok := productMap.m[productID]; ok {
-		return &product
+func getProduct(productID int) (*Product, error) {
+
+	row := database.DbConn.QueryRow(`SELECT 
+	productId,
+	manufacturer,
+	sku.
+	upc.
+	pricePerUnit,
+	quantityOnHand,
+	productName
+	From products,
+	WHERE productId=?`, productID)
+	product := &Product{}
+	err := row.Scan(&product.ProductID,
+		&product.Manufacturer,
+		&product.Sku,
+		&product.Upc,
+		&product.PricePerUnit,
+		&product.QuantityOnHand)
+	// if the raw is empty retrun nil, else return  error
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
 	}
-	return nil
+	return product, err
 }
 
 func removeProduct(productID int) {
@@ -114,7 +134,10 @@ func addOrUpdateProduct(product Product) (int, error) {
 	// if the product id is set, update, otherwise add
 	addOrUpdateID := -1
 	if product.ProductID > 0 {
-		oldProduct := getProduct(product.ProductID)
+		oldProduct, err := getProduct(product.ProductID)
+		if err != nil {
+			return addOrUpdateID, err
+		}
 		// if it exists, replace it, otherwise return error
 		if oldProduct == nil {
 			return 0, fmt.Errorf("product id [%d] doesn't exist", product.ProductID)
