@@ -17,5 +17,5 @@ func SetupDatabase() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Connecting to: %v", DbConn)
+	log.Printf("Connected to DB within %v ns", DbConn.Stats().WaitDuration.Nanoseconds())
 }
