@@ -56,26 +56,28 @@ func getProduct(productID int) (*Product, error) {
 	row := database.DbConn.QueryRow(`SELECT 
 	productId,
 	manufacturer,
-	sku.
-	upc.
+	sku,
+	upc,
 	pricePerUnit,
 	quantityOnHand,
 	productName
-	From products,
-	WHERE productId=?`, productID)
+	From products
+	WHERE productId = ?`, productID)
 	product := &Product{}
 	err := row.Scan(&product.ProductID,
 		&product.Manufacturer,
 		&product.Sku,
 		&product.Upc,
 		&product.PricePerUnit,
-		&product.QuantityOnHand)
+		&product.QuantityOnHand,
+		&product.ProductName)
 	// if the raw is empty retrun nil, else return  error
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
 	}
+	log.Printf("Retriving productID: %v", product.ProductID)
 	return product, err
 }
 
@@ -111,7 +113,7 @@ func getProductList() ([]Product, error) {
 			&product.ProductName)
 		products = append(products, product)
 	}
-	log.Printf("Retriving result: %v", products)
+	log.Printf("Retriving %d raws", len(products))
 	return products, nil
 }
 
