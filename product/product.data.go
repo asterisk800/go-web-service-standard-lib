@@ -107,7 +107,8 @@ func getProductList() ([]Product, error) {
 			&product.Sku,
 			&product.Upc,
 			&product.PricePerUnit,
-			&product.QuantityOnHand)
+			&product.QuantityOnHand,
+			&product.ProductName)
 		products = append(products, product)
 	}
 	log.Printf("Retriving result: %v", products)
