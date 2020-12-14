@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
+	"time"
 )
 
 // DbConn : capital because we want to export it and usee it in other modules.
@@ -17,5 +18,8 @@ func SetupDatabase() {
 		log.Fatal(err)
 	}
 
-	// log.Printf("Connected to DB within %v ns", DbConn.Stats().WaitDuration.Nanoseconds())
+	DbConn.SetMaxOpenConns(4)
+	DbConn.SetMaxIdleConns(4)
+	DbConn.SetConnMaxLifetime(60 * time.Second)
+
 }
