@@ -10,8 +10,10 @@ import (
 )
 
 func getProduct(productID int) (*Product, error) {
-
-	row := database.DbConn.QueryRow(`SELECT 
+	// if a query take more than 15 seconds it will cancel and retrun
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	row := database.DbConn.QueryRowContext(ctx, `SELECT 
 	productId,
 	manufacturer,
 	sku,
